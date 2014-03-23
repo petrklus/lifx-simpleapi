@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-
+import queue
 import bottle as btl
+import threading
 import lifx
 
 BROADCAST_ADDR = b'\00\00\00\00\00\00'
+q = queue.Queue()
 
 @btl.route('/hello/<name>')
 def index(name):
@@ -40,8 +42,9 @@ def all_lights_color(hue, saturation, brightness):
         cnvt = lambda val: int(val * scaling_coef)
         
         # set colour
-        all_colour(*map(cnvt, [hue, saturation, brightness]))
-        print("Color set")
+        params = map(cnvt, [hue, saturation, brightness])
+        command = LifxColourCommand(params)
+        q.put(command)
         return "OK"
         
     except Exception as e:
@@ -63,12 +66,43 @@ def all_colour(hue, saturation, brightness):
     lifx.set_color(*([BROADCAST_ADDR]+paramsTest))
 
 
+class LifxCommand(object):    
+
+    def run_action(self):
+        print("I worked!")
+    
+    
+class LifxColourCommand(LifxCommand):
+    
+    def __init__(self, params):
+        self.params = params
+    
+    def run_action(self):
+        all_colour(*self.params)
+        print("Color set")
+
+def worker():
+    while True:
+        item = q.get() #blocking call        
+        # TODO try twice/check confirmation?
+        try:
+            item.run_action()            
+        except Exception as e:
+            msg = "Error: {}".format(e)
+            print(msg)
+            return msg            
+
 
 # TODO some try/catch to ensure the commands got executed..
 # TODO create a lock to ensure that only one instance works on the bulbs..
-# 
-
 if __name__ == "__main__":
+    
+    num_worker_threads = 1
+    for i in range(num_worker_threads):
+         t = threading.Thread(target=worker)
+         t.daemon = True
+         t.start()
+        
     btl.run(server='cherrypy', host='0.0.0.0', port=8888)
 
 

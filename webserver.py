@@ -3,6 +3,7 @@
 import bottle as btl
 import lifx
 
+BROADCAST_ADDR = b'\00\00\00\00\00\00'
 
 @btl.route('/hello/<name>')
 def index(name):
@@ -19,10 +20,7 @@ def all_lights_on():
     light_power(False)
     return "OK"
 
-@btl.route('/all/test')
-def all_lights_on():
-    all_colour()
-    return "OK"
+
 
 @btl.route('/all/color/<hue>/<saturation>/<brightness>')
 def all_lights_color(hue, saturation, brightness):    
@@ -52,19 +50,18 @@ def all_lights_color(hue, saturation, brightness):
         return msg
 
 
-def light_power(power_state=False):
-    addr = b'\00\00\00\00\00\00'
-    lifx.set_power(addr, power_state)
+def light_power(power_state=False):    
+    lifx.set_power(BROADCAST_ADDR, power_state)
 
 def all_colour(hue, saturation, brightness):
     lights = lifx.get_lights()
 
     # hue, saturation, brightness, kelvin, fade_time)
     # [ 0x0000, 0x0000, 0xffff, 6500, 10000 ]
-    paramsTest = [ hue, saturation, brightness, 3500, 500]
+    paramsTest = [ hue, saturation, brightness, 3500, 50]
     print(paramsTest)
-    for light in lights:        
-        light.set_color(*paramsTest)      
+    lifx.set_color(*([BROADCAST_ADDR]+paramsTest))
+
 
 
 # TODO some try/catch to ensure the commands got executed..
@@ -73,3 +70,8 @@ def all_colour(hue, saturation, brightness):
 
 if __name__ == "__main__":
     btl.run(server='cherrypy', host='0.0.0.0', port=8888)
+
+
+
+
+

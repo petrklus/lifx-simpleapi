@@ -89,12 +89,12 @@ def worker():
             item.run_action()            
         except Exception as e:
             msg = "Error: {}".format(e)
-            print(msg)
-            return msg            
+            print(msg)         
 
 
 # TODO some try/catch to ensure the commands got executed..
 # TODO create a lock to ensure that only one instance works on the bulbs..
+# TODO move power command to the queue too
 if __name__ == "__main__":
     
     num_worker_threads = 1

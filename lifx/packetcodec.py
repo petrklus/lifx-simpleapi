@@ -4,6 +4,8 @@ from binascii import hexlify as tohex
 
 from .lifxconstants import *
 
+BCAST = b'\00\00\00\00\00\00'
+
 class Packet:
     def __init__(self, payload = None):
         self.size = 0
@@ -16,7 +18,7 @@ class Packet:
         else:
             self.payload = payload
 
-    def __str__(self):
+    def __repr__(self):
         return('<packet proto:%s, target:%s, site:%s, type:%s>' %
                (str(tohex(pack('>H', self.proto)), encoding='utf-8'),
                 str(tohex(self.target), encoding='utf-8'),

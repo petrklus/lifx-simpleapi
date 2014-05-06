@@ -7,7 +7,7 @@ lifx.set_power(lifx.BCAST, True)
 
 
 
-def light_set_colour(light_addr, hue, saturation, brightness):    
+def light_set_colour(light, hue, saturation, brightness):    
     hue =           int(hue)
     saturation =    int(saturation)
     brightness =    int(brightness)
@@ -27,33 +27,32 @@ def light_set_colour(light_addr, hue, saturation, brightness):
     
     paramsTest = list(params) + [3500, 50]
     print(paramsTest)
-    lifx.set_color(light_addr, *paramsTest)
+    light.set_color(*paramsTest)
     
 
-from binascii import hexlify, unhexlify
+
+
 if __name__ == "__main__":
     
     import sys
-    # lights = lifx.get_lights()
+    lights = lifx.get_lights()
     
     packets = sys.argv[1].split(".")
     
+    control_lights = {}
     for packet in packets:
         print(packet)
         try:
             light_addr, hue, saturation, brightness = packet.split(",")
-            light_set_colour(unhexlify(light_addr), hue, saturation, brightness)
-            
+            control_lights[light_addr] = hue, saturation, brightness
         except ValueError:
             print("Invalid packet: {}".format(packet))
     
-    # 
-    # 
-    # print(light_addr)
-    # for light in lights:
-    #     cur_addr = light.get_addr()
-    #     if cur_addr in control_lights.keys():            
-    #         light_set_colour(light, *control_lights[cur_addr])
+    print(light_addr)
+    for light in lights:
+        cur_addr = light.get_addr()
+        if cur_addr in control_lights.keys():            
+            light_set_colour(light, *control_lights[cur_addr])
     
     
 """

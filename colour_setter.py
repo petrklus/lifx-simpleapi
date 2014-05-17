@@ -13,8 +13,7 @@ def light_set_colour(light_addr, hue, saturation, brightness):
     brightness =    int(brightness)
 
     # pre-scale hue, TODO integrate into checks..
-    hue = hue / 355 * 100
-
+    hue = hue / 360 * 100
     if hue > 100 or saturation > 100 or brightness > 100 \
       or hue < 0 or saturation < 0   or brightness < 0:
         raise Exception("Only accepting percentages between 0 and 100")

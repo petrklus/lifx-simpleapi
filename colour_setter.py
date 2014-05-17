@@ -59,7 +59,6 @@ if __name__ == "__main__":
 
 office:         d073d500072c
 living room:    d073d5010fe5
-./colour_setter.py d073d500072c 355 100 100
-./colour_setter.py d073d5010fe5 355 100 0
+./colour_setter.py d073d500072c,355,100,100.d073d5010fe5,355,100,100.
 
 """
